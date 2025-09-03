@@ -1,0 +1,262 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User roles and authentication
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  role          UserRole  @default(AGENT)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  // NextAuth.js fields
+  accounts      Account[]
+  sessions      Session[]
+
+  // Property relationships
+  createdProperties Property[] @relation("PropertyCreator")
+  assignedProperties Property[] @relation("PropertyAssignee")
+  propertyHistories PropertyHistory[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// Property management models
+model Property {
+  id           String         @id @default(cuid())
+  category     Category       @relation(fields: [categoryId], references: [id])
+  categoryId   String
+  
+  // Address information
+  district     District       @relation(fields: [districtId], references: [id])
+  districtId   String
+  building     Building       @relation(fields: [buildingId], references: [id])
+  buildingId   String
+  apartment    String?
+  floor        Int?
+  
+  // Property details
+  totalArea    Float?
+  livingArea   Float?
+  kitchenArea  Float?
+  rooms        Int?
+  ceilingHeight Float?
+  balcony      String?        // Balcony type (есть, нет, лоджия, etc.)
+  loggia       Boolean?       @default(false)
+  
+  // Additional fields from real database
+  layout       String?        // План (новая, хрущевка, etc.)
+  totalFloors  Int?           // Эть - total floors in building 
+  wallMaterial String?        // М - материал стен (к, п, б, д, монолит)
+  condition    String?        // Состояние
+  yearBuilt    Int?          // Год постройки
+  phone        String?        // Телефон
+  source       String?        // Источник
+  renovation   String?        @default("NONE")
+  pField       String?        // П - (н, т, у)
+  
+  // Price and status
+  price        Float?
+  pricePerSqm  Float?
+  currency     String         @default("KZT")
+  status       PropertyStatus @default(ACTIVE)
+  isArchived   Boolean        @default(false)
+  
+  // Metadata
+  description  String?
+  notes        String?
+  photos       PropertyPhoto[]
+  
+  // User relationships
+  createdBy    User           @relation("PropertyCreator", fields: [createdById], references: [id])
+  createdById  String
+  assignedTo   User?          @relation("PropertyAssignee", fields: [assignedToId], references: [id])
+  assignedToId String?
+  
+  // Timestamps
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  
+  // History tracking
+  histories    PropertyHistory[]
+
+  @@map("properties")
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String?
+  isActive    Boolean    @default(true)
+  properties  Property[]
+
+  @@map("categories")
+}
+
+model District {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String?
+  isActive    Boolean    @default(true)
+  buildings   Building[]
+  properties  Property[]
+
+  @@map("districts")
+}
+
+model Building {
+  id               String     @id @default(cuid())
+  district         District?  @relation(fields: [districtId], references: [id])
+  districtId       String?    // Сделали опциональным
+  
+  // Address fields
+  street           String
+  houseNumber      String
+  fullAddress      String     // Полный адрес для поиска
+  
+  // Building characteristics from CSV
+  totalFloors      Int?
+  yearBuilt        Int?
+  wallMaterial     String?    // Материал стен (Кирпич, Панель, etc.)
+  entranceCount    Int?       // Количество подъездов
+  
+  // Additional building info
+  buildingType     String?    // Тип здания (жилой, коммерческий, etc.)
+  layout           String?    // Планировка
+  hasElevator      Boolean    @default(false)
+  hasGarbageChute  Boolean    @default(false)
+  heatingType      String?
+  
+  // Geographic data
+  latitude         Float?
+  longitude        Float?
+  
+  // Data quality and sources
+  dataSource       String?    // Источник данных (base, 2gis, krisha.kz, etc.)
+  confidenceLevel  ConfidenceLevel @default(MEDIUM)
+  isVerified       Boolean    @default(false)
+  
+  // System fields
+  isActive         Boolean    @default(true)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  
+  properties       Property[]
+
+  @@unique([street, houseNumber])
+  @@index([street, houseNumber])
+  @@index([fullAddress])
+  @@map("buildings")
+}
+
+model PropertyPhoto {
+  id         String   @id @default(cuid())
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String
+  filename   String
+  url        String
+  caption    String?
+  isPrimary  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@map("property_photos")
+}
+
+model PropertyHistory {
+  id         String             @id @default(cuid())
+  property   Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String
+  user       User               @relation(fields: [userId], references: [id])
+  userId     String
+  action     PropertyAction
+  field      String?
+  oldValue   String?
+  newValue   String?
+  notes      String?
+  createdAt  DateTime           @default(now())
+
+  @@map("property_histories")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  MANAGER
+  AGENT
+}
+
+enum PropertyStatus {
+  ACTIVE
+  RESERVED
+  SOLD
+  RENTED
+  SUSPENDED
+}
+
+enum PropertyAction {
+  CREATED
+  UPDATED
+  ARCHIVED
+  RESTORED
+  STATUS_CHANGED
+  ASSIGNED
+  PRICE_CHANGED
+}
+
+enum ConfidenceLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// Verification tokens for NextAuth.js
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}

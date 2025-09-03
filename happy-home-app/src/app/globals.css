@@ -1,0 +1,246 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Happy Home Brand Colors */
+  --brand-green-primary: #006837;
+  --brand-green-dark: #004026;
+  --brand-green-light: #228B4E;
+  --brand-gold-light: #F2D250;
+  --brand-gold-dark: #C49A3A;
+  --brand-gold-gradient: linear-gradient(135deg, #F2D250 0%, #C49A3A 100%);
+  
+  /* Base colors */
+  --background: #ffffff;
+  --foreground: #1f2937;
+  --card: #ffffff;
+  --card-foreground: #1f2937;
+  --popover: #ffffff;
+  --popover-foreground: #1f2937;
+  
+  /* Primary brand colors */
+  --primary: var(--brand-green-primary);
+  --primary-foreground: #ffffff;
+  --secondary: #f8f9fa;
+  --secondary-foreground: var(--brand-green-dark);
+  
+  /* Accent colors */
+  --accent: var(--brand-gold-light);
+  --accent-foreground: var(--brand-green-dark);
+  --muted: #f1f3f4;
+  --muted-foreground: #64748b;
+  
+  /* Interactive elements */
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: #f9fafb;
+  --ring: var(--brand-green-primary);
+  --radius: 0.5rem;
+  
+  /* Status colors */
+  --success: var(--brand-green-primary);
+  --success-foreground: #ffffff;
+  --warning: var(--brand-gold-dark);
+  --warning-foreground: #ffffff;
+  --info: #2563eb;
+  --info-foreground: #ffffff;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Brand Typography */
+h1, h2, h3, .heading {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 600;
+  color: var(--brand-green-dark);
+}
+
+.brand-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  background: var(--brand-gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Brand gradients and effects */
+.gold-gradient {
+  background: var(--brand-gold-gradient);
+}
+
+.gold-text {
+  color: var(--brand-gold-dark);
+}
+
+.green-text {
+  color: var(--brand-green-primary);
+}
+
+/* Brand-styled table container */
+.table-container {
+  background: white;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Excel-like alternating rows with brand colors */
+.table-row-even {
+  background-color: #edf4fc !important; /* Light blue */
+}
+
+.table-row-odd {
+  background-color: #cbe2ff !important; /* Slightly darker blue */
+}
+
+.table-row-hover:hover {
+  background-color: #d4e6ff !important; /* Medium blue on hover */
+}
+
+/* Enhanced text readability - stronger contrast and weights */
+.table-text {
+  color: #111827;
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.table-text-strong {
+  color: #000000;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* Table border styles */
+table.border-collapse {
+  border-collapse: collapse;
+}
+
+table th, table td {
+  border: 1px solid #ffffff;
+  vertical-align: middle;
+}
+
+table thead th {
+  border-bottom: 1px solid #ffffff;
+  background-color: #e5eeff;
+}
+
+/* Filter inputs with improved readability */
+.filter-input {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #111827;
+  line-height: 1.3;
+}
+
+.filter-input::placeholder {
+  color: #6b7280;
+  font-weight: 400;
+}
+
+/* Status indicators with brand colors */
+.status-active {
+  background-color: var(--brand-green-primary);
+  color: white;
+}
+
+.status-reserved {
+  background-color: var(--brand-gold-dark);
+  color: white;
+}
+
+.status-sold {
+  background-color: #6b7280;
+  color: white;
+}
+
+.status-rented {
+  background-color: #2563eb;
+  color: white;
+}
+
+.status-suspended {
+  background-color: var(--brand-gold-light);
+  color: var(--brand-green-dark);
+}
+
+/* Enhanced form inputs with brand styling */
+input, select, textarea {
+  border: 1px solid var(--border);
+  background: var(--input);
+  color: var(--foreground);
+  border-radius: calc(var(--radius) - 2px);
+  transition: all 0.2s ease-in-out;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--brand-green-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 104, 55, 0.1);
+}
+
+/* Brand buttons */
+.btn-primary {
+  background: var(--brand-green-primary);
+  color: white;
+  border: 1px solid var(--brand-green-primary);
+  border-radius: var(--radius);
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: var(--brand-green-dark);
+  border-color: var(--brand-green-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 104, 55, 0.25);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--brand-green-primary);
+  border: 1px solid var(--brand-green-primary);
+  border-radius: var(--radius);
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-secondary:hover {
+  background-color: var(--brand-green-primary);
+  color: white;
+}
+
+.btn-gold {
+  background: var(--brand-gold-gradient);
+  color: var(--brand-green-dark);
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-gold:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(242, 210, 80, 0.4);
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
